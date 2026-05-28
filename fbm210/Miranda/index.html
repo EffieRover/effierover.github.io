@@ -454,7 +454,7 @@ Begin by introducing yourself and asking your first question about their design 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": API_KEY
+        "Authorization": `Bearer ${API_KEY}`
       },
       body: JSON.stringify(body)
     });
