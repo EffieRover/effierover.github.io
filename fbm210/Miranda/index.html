@@ -1,21 +1,24 @@
+
+raw
+Miranda chat · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Miranda Priestly — Design Consultation</title>
-
+ 
 <script>
 // ============================================================
 //  CONFIGURATION — edit this section only
 // ============================================================
-
-const API_KEY = "AQ.Ab8RN6KfLVvV_JA7HNz_N-NWmkaayraVgtzYnn4YzRqZgDLHHQ";
-
+ 
+const API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+ 
 const MODEL = "gemini-2.0-flash";
-
+ 
 const SYSTEM_PROMPT = `You are Miranda Priestly, the legendary editor-in-chief of the fictional Runway from Devil Wears Prada, known for your sharp eye, exacting standards, and ability to see potential in emerging designers. Today you're mentoring a fashion design student who needs help clarifying their design vision before selecting a base garment from the CLO library to modify for their portfolio.
-
+ 
 Your role is to:
 Ask pointed but supportive questions that help the student articulate their design vision
 Guide them to translate aesthetic goals into structural garment requirements (seam types, fit, shaping)
@@ -23,7 +26,7 @@ Help them recognize what features to look for when browsing the library
 Help them choose a well-suited base garment design to begin their project
 Be direct and expect thoughtful answers, but remain encouraging
 Channel your Devil Wears Prada energy while being genuinely invested in their success
-
+ 
 Important guidelines:
 Ask ONE question at a time and wait for the student's response
 Do NOT make design decisions for them - you're a sounding board, not their brain
@@ -34,19 +37,19 @@ After covering their design vision, structural requirements, and what to look fo
 If they're ready to browse, give them a Miranda-esque sendoff and end the conversation
 If they need more clarity, continue with follow-up questions
 Include some stylistic text, for example, "Miranda looks up at your entrance and dramatically removes her glasses."
-
+ 
 Remember: Your goal is to help them develop their own design thinking, not to hand them answers. Be exacting but fair. Be sharp but supportive. Make them think.
-
+ 
 Begin by introducing yourself and asking your first question about their design vision.`;
-
+ 
 // ============================================================
 //  END CONFIGURATION
 // ============================================================
 </script>
-
+ 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-
+ 
 <style>
   /*
     WCAG 2.1 AA Contrast Ratios (verified):
@@ -55,12 +58,12 @@ Begin by introducing yourself and asking your first question about their design 
     Miranda bubble #1a1a1a on #f5f0e8   → 15.3:1  ✓
     User bubble #ffffff on #1a1a1a      → 17.4:1  ✓
     Send button #0d0d0d on #c9a96e      → 8.7:1   ✓
-    Placeholder #767676 on #ffffff       → 4.5:1   ✓ (minimum threshold)
+    Placeholder #767676 on #ffffff       → 4.5:1   ✓
     Gold #c9a96e used for borders/decorative only (non-text)
   */
-
+ 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   body {
     background: #ffffff;
     color: #1a1a1a;
@@ -70,7 +73,7 @@ Begin by introducing yourself and asking your first question about their design 
     flex-direction: column;
     overflow: hidden;
   }
-
+ 
   /* HEADER */
   header {
     background: #ffffff;
@@ -79,39 +82,39 @@ Begin by introducing yourself and asking your first question about their design 
     text-align: center;
     flex-shrink: 0;
   }
-
+ 
   .runway-label {
-    letter-spacing: 0.4em;
-    font-size: 10px;
+    letter-spacing: 0.3em;
+    font-size: 13px;
     color: #6b4c00;
     text-transform: uppercase;
     margin-bottom: 6px;
   }
-
+ 
   header h1 {
-    font-size: clamp(24px, 4vw, 40px);
+    font-size: clamp(28px, 4vw, 44px);
     font-weight: 300;
     color: #1a1a1a;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     line-height: 1;
   }
-
+ 
   .subtitle {
-    font-size: 11px;
+    font-size: 13px;
     color: #555555;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     margin-top: 7px;
   }
-
+ 
   .gold-rule {
     width: 50px;
     height: 1px;
     background: #c9a96e;
     margin: 10px auto 0;
   }
-
+ 
   /* CHAT AREA */
   #chat-area {
     flex: 1;
@@ -125,11 +128,11 @@ Begin by introducing yourself and asking your first question about their design 
     margin: 0 auto;
     scroll-behavior: smooth;
   }
-
+ 
   #chat-area::-webkit-scrollbar { width: 4px; }
   #chat-area::-webkit-scrollbar-track { background: #f0ece4; }
   #chat-area::-webkit-scrollbar-thumb { background: #c9a96e; }
-
+ 
   /* SPLASH */
   #splash {
     display: flex;
@@ -141,17 +144,17 @@ Begin by introducing yourself and asking your first question about their design 
     padding: 40px 20px;
     min-height: 300px;
   }
-
+ 
   .splash-quote {
     color: #6b4c00;
-    font-size: clamp(15px, 2.5vw, 19px);
+    font-size: clamp(16px, 2.5vw, 20px);
     font-style: italic;
     letter-spacing: 0.04em;
     max-width: 480px;
     line-height: 1.75;
     margin-bottom: 34px;
   }
-
+ 
   #start-btn {
     background: #1a1a1a;
     border: 2px solid #1a1a1a;
@@ -159,61 +162,61 @@ Begin by introducing yourself and asking your first question about their design 
     padding: 13px 42px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: 13px;
     cursor: pointer;
     font-family: 'Cormorant Garamond', Georgia, serif;
     transition: background 0.2s, color 0.2s;
   }
-
+ 
   #start-btn:hover {
     background: #ffffff;
     color: #1a1a1a;
   }
-
+ 
   #start-btn:focus-visible {
     outline: 3px solid #c9a96e;
     outline-offset: 3px;
   }
-
+ 
   /* MESSAGES */
   .msg-miranda, .msg-user {
     display: flex;
     flex-direction: column;
     max-width: 84%;
   }
-
+ 
   .msg-miranda { align-items: flex-start; }
   .msg-user { align-items: flex-end; align-self: flex-end; }
-
+ 
   .msg-label {
-    font-size: 9px;
-    letter-spacing: 0.35em;
+    font-size: 12px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     margin-bottom: 6px;
   }
-
+ 
   .msg-miranda .msg-label { color: #6b4c00; }
   .msg-user .msg-label { color: #555555; }
-
+ 
   .bubble-miranda {
     background: #f5f0e8;
     border-left: 3px solid #c9a96e;
     padding: 16px 20px;
     color: #1a1a1a;
-    font-size: clamp(14px, 1.8vw, 16px);
+    font-size: clamp(15px, 1.8vw, 17px);
     line-height: 1.8;
     white-space: pre-wrap;
   }
-
+ 
   .bubble-user {
     background: #1a1a1a;
     color: #ffffff;
     padding: 13px 18px;
-    font-size: clamp(14px, 1.8vw, 15px);
+    font-size: clamp(15px, 1.8vw, 16px);
     line-height: 1.7;
     white-space: pre-wrap;
   }
-
+ 
   /* TYPING INDICATOR */
   .typing-dots {
     display: flex;
@@ -223,7 +226,7 @@ Begin by introducing yourself and asking your first question about their design 
     background: #f5f0e8;
     border-left: 3px solid #c9a96e;
   }
-
+ 
   .dot {
     width: 7px;
     height: 7px;
@@ -231,15 +234,15 @@ Begin by introducing yourself and asking your first question about their design 
     background: #6b4c00;
     animation: pulse 1.2s ease-in-out infinite;
   }
-
+ 
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
-
+ 
   @keyframes pulse {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1); }
   }
-
+ 
   /* INPUT ROW */
   #input-row {
     flex-shrink: 0;
@@ -253,9 +256,9 @@ Begin by introducing yourself and asking your first question about their design 
     width: 100%;
     margin: 0 auto;
   }
-
+ 
   #input-row.visible { display: flex; }
-
+ 
   #user-input {
     flex: 1;
     background: #ffffff;
@@ -264,7 +267,7 @@ Begin by introducing yourself and asking your first question about their design 
     color: #1a1a1a;
     padding: 11px 15px;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 15px;
+    font-size: 16px;
     resize: none;
     outline: none;
     line-height: 1.6;
@@ -272,15 +275,15 @@ Begin by introducing yourself and asking your first question about their design 
     max-height: 120px;
     overflow-y: auto;
   }
-
+ 
   #user-input::placeholder { color: #767676; }
-
+ 
   #user-input:focus-visible {
     border-color: #6b4c00;
     outline: 2px solid #6b4c00;
     outline-offset: 1px;
   }
-
+ 
   #send-btn {
     background: #c9a96e;
     border: 2px solid #c9a96e;
@@ -289,7 +292,7 @@ Begin by introducing yourself and asking your first question about their design 
     cursor: pointer;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 13px;
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-weight: 700;
     flex-shrink: 0;
@@ -297,23 +300,23 @@ Begin by introducing yourself and asking your first question about their design 
     min-height: 44px;
     min-width: 44px;
   }
-
+ 
   #send-btn:disabled { opacity: 0.45; cursor: default; }
-
+ 
   #send-btn:focus-visible {
     outline: 3px solid #1a1a1a;
     outline-offset: 3px;
   }
-
+ 
   #send-btn:hover:not(:disabled) {
     background: #b8924e;
     border-color: #b8924e;
   }
-
+ 
   /* ERROR */
   #error-msg {
     color: #a30000;
-    font-size: 13px;
+    font-size: 14px;
     text-align: center;
     letter-spacing: 0.05em;
     padding: 6px 20px;
@@ -321,30 +324,30 @@ Begin by introducing yourself and asking your first question about their design 
     max-width: 780px;
     width: 100%;
     margin: 0 auto;
+    word-break: break-word;
   }
 </style>
 </head>
-
+ 
 <body>
-
+ 
 <header>
   <div class="runway-label">Runway Magazine</div>
   <h1>Miranda Priestly</h1>
   <div class="subtitle">Design Consultation</div>
   <div class="gold-rule" role="presentation"></div>
 </header>
-
+ 
 <main id="chat-area" aria-live="polite" aria-label="Conversation with Miranda Priestly">
   <div id="splash">
     <p class="splash-quote">"You have no idea how much is riding on what you're about to create. Let's make sure you do."</p>
     <button id="start-btn">Enter the Office</button>
   </div>
 </main>
-
+ 
 <div id="error-msg" role="alert"></div>
-
+ 
 <div id="input-row" role="form" aria-label="Send a message">
-  <label for="user-input" class="msg-label" style="display:none">Your message</label>
   <textarea
     id="user-input"
     placeholder="Speak carefully. She's listening."
@@ -353,7 +356,7 @@ Begin by introducing yourself and asking your first question about their design 
   ></textarea>
   <button id="send-btn" aria-label="Send message">Send</button>
 </div>
-
+ 
 <script>
   const chatArea = document.getElementById("chat-area");
   const inputRow = document.getElementById("input-row");
@@ -361,147 +364,144 @@ Begin by introducing yourself and asking your first question about their design 
   const sendBtn = document.getElementById("send-btn");
   const errorMsg = document.getElementById("error-msg");
   const startBtn = document.getElementById("start-btn");
-
+ 
   let history = [];
   let isLoading = false;
-
-  // Auto-resize textarea
+ 
   userInput.addEventListener("input", () => {
     userInput.style.height = "auto";
     userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px";
   });
-
+ 
   userInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
-
+ 
   sendBtn.addEventListener("click", sendMessage);
   startBtn.addEventListener("click", startSession);
-
+ 
   function scrollBottom() {
     chatArea.scrollTop = chatArea.scrollHeight;
   }
-
+ 
   function showError(text) {
     errorMsg.textContent = text;
     errorMsg.style.display = "block";
-    setTimeout(() => { errorMsg.style.display = "none"; }, 5000);
+    setTimeout(() => { errorMsg.style.display = "none"; }, 10000);
   }
-
+ 
   function appendMessage(role, text) {
     const wrapper = document.createElement("div");
     wrapper.className = role === "assistant" ? "msg-miranda" : "msg-user";
-
+ 
     const label = document.createElement("div");
     label.className = "msg-label";
     label.setAttribute("aria-hidden", "true");
     label.textContent = role === "assistant" ? "Miranda Priestly" : "You";
-
+ 
     const bubble = document.createElement("div");
     bubble.className = role === "assistant" ? "bubble-miranda" : "bubble-user";
     bubble.textContent = text;
-
-    const srLabel = document.createElement("span");
-    srLabel.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;";
-    srLabel.textContent = (role === "assistant" ? "Miranda says: " : "You said: ") + text;
-
+ 
     wrapper.appendChild(label);
     wrapper.appendChild(bubble);
     chatArea.appendChild(wrapper);
     scrollBottom();
-    return wrapper;
   }
-
+ 
   function showTyping() {
     const wrapper = document.createElement("div");
     wrapper.className = "msg-miranda";
     wrapper.id = "typing-indicator";
     wrapper.setAttribute("aria-label", "Miranda is typing");
-
+ 
     const label = document.createElement("div");
     label.className = "msg-label";
     label.setAttribute("aria-hidden", "true");
     label.textContent = "Miranda Priestly";
-
+ 
     const dots = document.createElement("div");
     dots.className = "typing-dots";
     dots.setAttribute("aria-hidden", "true");
     dots.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-
+ 
     wrapper.appendChild(label);
     wrapper.appendChild(dots);
     chatArea.appendChild(wrapper);
     scrollBottom();
   }
-
+ 
   function removeTyping() {
     const t = document.getElementById("typing-indicator");
     if (t) t.remove();
   }
-
+ 
   async function callGemini(conversationHistory) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
-
+ 
     const contents = conversationHistory.map(m => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }]
     }));
-
+ 
     const body = {
       system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
       contents: contents,
       generationConfig: { maxOutputTokens: 1000 }
     };
-
+ 
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": API_KEY
+      },
       body: JSON.stringify(body)
     });
-
+ 
     if (!response.ok) {
       const err = await response.json();
-      throw new Error(err?.error?.message || "API error");
+      throw new Error(JSON.stringify(err));
     }
-
+ 
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
   }
-
+ 
   async function startSession() {
     document.getElementById("splash").remove();
     inputRow.classList.add("visible");
     setLoading(true);
-
+ 
     history = [{ role: "user", content: "Begin." }];
-
+ 
     try {
       const reply = await callGemini(history);
       history.push({ role: "assistant", content: reply });
       appendMessage("assistant", reply);
     } catch (e) {
-      showError("The connection faltered. Even Runway has technical difficulties.");
+      showError(e.message);
     } finally {
       setLoading(false);
       userInput.focus();
     }
   }
-
+ 
   async function sendMessage() {
     const text = userInput.value.trim();
     if (!text || isLoading) return;
-
+ 
     userInput.value = "";
     userInput.style.height = "auto";
-
+ 
     history.push({ role: "user", content: text });
     appendMessage("user", text);
     setLoading(true);
     showTyping();
-
+ 
     try {
       const reply = await callGemini(history);
       history.push({ role: "assistant", content: reply });
@@ -509,19 +509,19 @@ Begin by introducing yourself and asking your first question about their design 
       appendMessage("assistant", reply);
     } catch (e) {
       removeTyping();
-      showError("Something went wrong. Please try again.");
+      showError(e.message);
     } finally {
       setLoading(false);
       userInput.focus();
     }
   }
-
+ 
   function setLoading(state) {
     isLoading = state;
     sendBtn.disabled = state;
     userInput.disabled = state;
   }
 </script>
-
+ 
 </body>
 </html>
