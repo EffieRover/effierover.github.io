@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Run: Dungeon Mapper</title>
+<style>
+  body {
+    background: #ffffff;
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 1.5rem;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 13px;
+    color: #555;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .ld-computer { background: #6dbf6d; }
+  .ld-user { background: #7ec8e3; }
+
+  .terminal-wrap {
+    background: #0d0d0d;
+    border-radius: 6px;
+    border: 1px solid #333;
+    overflow: hidden;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  .win-titlebar {
+    background: #2a2a2a;
+    border-bottom: 1px solid #3a3a3a;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .win-title {
+    font-size: 12px;
+    color: #aaa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .win-right { display: flex; align-items: center; gap: 8px; }
+  .status-badge {
+    font-size: 11px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #888;
+    background: #1e1e1e;
+    padding: 1px 7px;
+    border-radius: 3px;
+    border: 1px solid #444;
+    min-width: 60px;
+    text-align: center;
+  }
+  .win-buttons { display: flex; gap: 2px; }
+  .win-btn {
+    width: 28px;
+    height: 18px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #aaa;
+    background: #3a3a3a;
+    cursor: default;
+    user-select: none;
+  }
+  .win-btn-close { background: #c0392b; color: #fff; }
+
+  .terminal-body {
+    padding: 0.75rem 1rem;
+    height: 550px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    outline: none;
+  }
+
+  .line-computer { color: #6dbf6d; display: block; }
+  .line-user { color: #7ec8e3; display: inline; }
+  .line-separator { color: #6dbf6d; display: block; }
+  .line-reward { color: #6dbf6d; display: block; }
+  .line-totals { color: #6dbf6d; display: block; }
+  .line-bonus { color: #6dbf6d; display: block; }
+  .line-fail { color: #6dbf6d; display: block; }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: #7ec8e3;
+    vertical-align: middle;
+    animation: blink 0.7s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .controls {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .play-btn {
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .play-btn:hover:not(:disabled) { background: #388e3c; }
+  .play-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
+
+  .run-status {
+    font-size: 12px;
+    color: #555;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sample Run: Dungeon Mapper</h1>
+
+<div class="legend" role="list" aria-label="Color legend">
+  <div class="legend-item" role="listitem">
+    <div class="legend-dot ld-computer" aria-hidden="true"></div>
+    <span>Computer output</span>
+  </div>
+  <div class="legend-item" role="listitem">
+    <div class="legend-dot ld-user" aria-hidden="true"></div>
+    <span>User typing</span>
+  </div>
+</div>
+
+<div class="terminal-wrap" role="region" aria-label="Terminal demo">
+  <div class="win-titlebar" aria-hidden="true">
+    <span class="win-title">Python 3.13.0 — dungeon_mapper.py</span>
+    <div class="win-right">
+      <span class="status-badge" id="badge"></span>
+      <div class="win-buttons">
+        <div class="win-btn">—</div>
+        <div class="win-btn">□</div>
+        <div class="win-btn win-btn-close">✕</div>
+      </div>
+    </div>
+  </div>
+  <div class="terminal-body" id="output" role="log" aria-live="polite" tabindex="0"></div>
+</div>
+
+<div class="controls">
+  <button class="play-btn" id="playBtn" aria-label="Play sample run" onclick="startDemo()">▶ Play</button>
+  <span class="run-status" id="runStatus" aria-live="polite"></span>
+</div>
+
+<p class="sr-only">
+  This is an animated demonstration of a Python program. The program runs five dungeon draft rounds, tracking gold, scrolls, and party HP. Green text shows computer output; blue text shows user input.
+</p>
+
+<script>
+// Each step: type = 'print' | 'prompt' | 'separator' | 'reward' | 'totals' | 'bonus' | 'fail' | 'blank'
+// For 'prompt': text is the prompt label, input is the simulated user response
+var steps = [
+  { type: 'print',  text: '=== Dungeon Mapper ===' },
+  { type: 'blank' },
+
+  // Round 1
+  { type: 'separator', text: '--- Round 1 ---' },
+  { type: 'print',  text: 'Choose a room to draft:' },
+  { type: 'print',  text: '1. Library' },
+  { type: 'print',  text: '2. Kitchen' },
+  { type: 'print',  text: '3. Throne Room' },
+  { type: 'prompt', text: 'Enter 1, 2, or 3: ', input: '1' },
+  { type: 'blank' },
+  { type: 'print',  text: 'You drafted the Library.' },
+  { type: 'reward', text: '  Gold found:    4' },
+  { type: 'reward', text: '  Scrolls found: 15' },
+  { type: 'reward', text: '  Monster HP:    8' },
+  { type: 'blank' },
+  { type: 'totals', text: '  Running totals — Gold: 4 | Scrolls: 15 | Party HP: 92' },
+  { type: 'blank' },
+
+  // Round 2
+  { type: 'separator', text: '--- Round 2 ---' },
+  { type: 'print',  text: 'Choose a room to draft:' },
+  { type: 'print',  text: '1. Library' },
+  { type: 'print',  text: '2. Kitchen' },
+  { type: 'print',  text: '3. Throne Room' },
+  { type: 'prompt', text: 'Enter 1, 2, or 3: ', input: '3' },
+  { type: 'blank' },
+  { type: 'print',  text: 'You drafted the Throne Room.' },
+  { type: 'reward', text: '  Gold found:    24' },
+  { type: 'reward', text: '  Scrolls found: 7' },
+  { type: 'reward', text: '  Monster HP:    31' },
+  { type: 'blank' },
+  { type: 'totals', text: '  Running totals — Gold: 28 | Scrolls: 22 | Party HP: 61' },
+  { type: 'blank' },
+
+  // Round 3
+  { type: 'separator', text: '--- Round 3 ---' },
+  { type: 'print',  text: 'Choose a room to draft:' },
+  { type: 'print',  text: '1. Library' },
+  { type: 'print',  text: '2. Kitchen' },
+  { type: 'print',  text: '3. Throne Room' },
+  { type: 'prompt', text: 'Enter 1, 2, or 3: ', input: '2' },
+  { type: 'blank' },
+  { type: 'print',  text: 'You drafted the Kitchen.' },
+  { type: 'reward', text: '  Gold found:    15' },
+  { type: 'reward', text: '  Scrolls found: 3' },
+  { type: 'reward', text: '  Monster HP:    12' },
+  { type: 'blank' },
+  { type: 'totals', text: '  Running totals — Gold: 43 | Scrolls: 25 | Party HP: 49' },
+  { type: 'blank' },
+
+  // Round 4
+  { type: 'separator', text: '--- Round 4 ---' },
+  { type: 'print',  text: 'Choose a room to draft:' },
+  { type: 'print',  text: '1. Library' },
+  { type: 'print',  text: '2. Kitchen' },
+  { type: 'print',  text: '3. Throne Room' },
+  { type: 'prompt', text: 'Enter 1, 2, or 3: ', input: '1' },
+  { type: 'blank' },
+  { type: 'print',  text: 'You drafted the Library.' },
+  { type: 'reward', text: '  Gold found:    1' },
+  { type: 'reward', text: '  Scrolls found: 12' },
+  { type: 'reward', text: '  Monster HP:    6' },
+  { type: 'blank' },
+  { type: 'totals', text: '  Running totals — Gold: 44 | Scrolls: 37 | Party HP: 43' },
+  { type: 'blank' },
+
+  // Round 5
+  { type: 'separator', text: '--- Round 5 ---' },
+  { type: 'print',  text: 'Choose a room to draft:' },
+  { type: 'print',  text: '1. Library' },
+  { type: 'print',  text: '2. Kitchen' },
+  { type: 'print',  text: '3. Throne Room' },
+  { type: 'prompt', text: 'Enter 1, 2, or 3: ', input: '3' },
+  { type: 'blank' },
+  { type: 'print',  text: 'You drafted the Throne Room.' },
+  { type: 'reward', text: '  Gold found:    15' },
+  { type: 'reward', text: '  Scrolls found: 6' },
+  { type: 'reward', text: '  Monster HP:    35' },
+  { type: 'blank' },
+  { type: 'totals', text: '  Running totals — Gold: 59 | Scrolls: 43 | Party HP: 8' },
+  { type: 'blank' },
+
+  // End
+  { type: 'separator', text: '=== Dungeon Complete ===' },
+  { type: 'print',  text: 'Final Gold: 59' },
+  { type: 'print',  text: 'Final Scrolls: 43' },
+  { type: 'print',  text: 'Party HP Remaining: 8' },
+  { type: 'blank' },
+  { type: 'bonus',  text: 'The party pushes through a hidden door...' },
+  { type: 'bonus',  text: 'You have found the Treasure Trove.' },
+  { type: 'bonus',  text: 'Inside sits the Obsidian Scepter, last held by the dungeon\'s original master.' },
+  { type: 'bonus',  text: 'Whoever claims it controls the next adventure.' },
+];
+
+var timers = [];
+var running = false;
+
+function clearTimers() {
+  timers.forEach(function(t) { clearTimeout(t); });
+  timers = [];
+}
+
+function startDemo() {
+  clearTimers();
+  running = true;
+
+  var output = document.getElementById('output');
+  var btn = document.getElementById('playBtn');
+  var badge = document.getElementById('badge');
+  var status = document.getElementById('runStatus');
+
+  output.innerHTML = '';
+  btn.disabled = true;
+  badge.textContent = 'Running';
+  status.textContent = '';
+
+  var delay = 0;
+  var LINE_DELAY = 76;
+  var CHAR_DELAY = 84;
+  var PAUSE_AFTER_PROMPT = 960;
+  var ROUND_PAUSE = 360;
+  var TOTALS_PAUSE = 2800;
+
+  steps.forEach(function(step, idx) {
+    if (step.type === 'blank') {
+      timers.push(setTimeout(function() {
+        var el = document.createElement('span');
+        el.className = 'line-computer';
+        el.textContent = '';
+        output.appendChild(el);
+        output.scrollTop = output.scrollHeight;
+      }, delay));
+      delay += LINE_DELAY;
+      return;
+    }
+
+    if (step.type === 'separator') {
+      timers.push(setTimeout(function(s) {
+        return function() {
+          var el = document.createElement('span');
+          el.className = 'line-separator';
+          el.textContent = s.text;
+          output.appendChild(el);
+          output.scrollTop = output.scrollHeight;
+        };
+      }(step), delay));
+      delay += LINE_DELAY + ROUND_PAUSE;
+      return;
+    }
+
+    if (step.type === 'print' || step.type === 'reward' || step.type === 'totals' || step.type === 'bonus' || step.type === 'fail') {
+      var cssClass = {
+        print: 'line-computer',
+        reward: 'line-reward',
+        totals: 'line-totals',
+        bonus: 'line-bonus',
+        fail: 'line-fail'
+      }[step.type];
+
+      timers.push(setTimeout(function(s, cls) {
+        return function() {
+          var el = document.createElement('span');
+          el.className = cls;
+          el.textContent = s.text;
+          output.appendChild(el);
+          output.scrollTop = output.scrollHeight;
+        };
+      }(step, cssClass), delay));
+      delay += (step.type === 'totals') ? TOTALS_PAUSE : LINE_DELAY;
+      return;
+    }
+
+    if (step.type === 'prompt') {
+      // Print the prompt label
+      timers.push(setTimeout(function(s) {
+        return function() {
+          var promptEl = document.createElement('span');
+          promptEl.className = 'line-computer';
+          promptEl.textContent = s.text;
+          output.appendChild(promptEl);
+
+          // Cursor blink while "user types"
+          var cur = document.createElement('span');
+          cur.className = 'cursor';
+          cur.id = 'cursor-' + Math.random();
+          output.appendChild(cur);
+          output.scrollTop = output.scrollHeight;
+        };
+      }(step), delay));
+      delay += 350;
+
+      // Type each character of the input
+      var chars = step.input.split('');
+      chars.forEach(function(ch, ci) {
+        timers.push(setTimeout(function(s, c, isLast) {
+          return function() {
+            // Remove cursor first
+            var cursors = output.querySelectorAll('.cursor');
+            cursors.forEach(function(cur) { cur.remove(); });
+
+            // Append character
+            var charEl = document.createElement('span');
+            charEl.className = 'line-user';
+            charEl.textContent = c;
+            output.appendChild(charEl);
+
+            // Re-add cursor if not last char
+            if (!isLast) {
+              var cur = document.createElement('span');
+              cur.className = 'cursor';
+              output.appendChild(cur);
+            }
+            output.scrollTop = output.scrollHeight;
+          };
+        }(step, ch, ci === chars.length - 1), delay + ci * CHAR_DELAY));
+      });
+      delay += chars.length * CHAR_DELAY + PAUSE_AFTER_PROMPT;
+
+      // Newline after input
+      timers.push(setTimeout(function() {
+        var nl = document.createElement('span');
+        nl.className = 'line-computer';
+        nl.textContent = '';
+        output.appendChild(nl);
+        output.scrollTop = output.scrollHeight;
+      }, delay));
+      delay += LINE_DELAY;
+    }
+  });
+
+  // Done
+  timers.push(setTimeout(function() {
+    badge.textContent = 'Done';
+    btn.disabled = false;
+    status.textContent = 'Click Play to run again.';
+    running = false;
+  }, delay + 400));
+}
+</script>
+</body>
+</html>
