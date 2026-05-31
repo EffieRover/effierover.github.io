@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Run: Ticket to Ride Route Scorer</title>
+<style>
+  body {
+    background: #ffffff;
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 1.5rem;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 13px;
+    color: #555;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .ld-computer { background: #6dbf6d; }
+  .ld-user { background: #7ec8e3; }
+
+  .terminal-wrap {
+    background: #0d0d0d;
+    border-radius: 6px;
+    border: 1px solid #333;
+    overflow: hidden;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  .win-titlebar {
+    background: #2a2a2a;
+    border-bottom: 1px solid #3a3a3a;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .win-title {
+    font-size: 12px;
+    color: #aaa;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .win-right { display: flex; align-items: center; gap: 8px; }
+  .status-badge {
+    font-size: 11px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #888;
+    background: #1e1e1e;
+    padding: 1px 7px;
+    border-radius: 3px;
+    border: 1px solid #444;
+    min-width: 60px;
+    text-align: center;
+  }
+  .win-buttons { display: flex; gap: 2px; }
+  .win-btn {
+    width: 28px;
+    height: 18px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #aaa;
+    background: #3a3a3a;
+    cursor: default;
+    user-select: none;
+  }
+  .win-btn-close { background: #c0392b; color: #fff; }
+
+  .terminal-body {
+    padding: 0.75rem 1rem;
+    height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    outline: none;
+  }
+
+  .line-computer { color: #6dbf6d; display: block; }
+  .line-user { color: #7ec8e3; display: inline; }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: #7ec8e3;
+    vertical-align: middle;
+    animation: blink 0.7s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .controls {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .play-btn {
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-size: 13px;
+    font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .play-btn:hover:not(:disabled) { background: #388e3c; }
+  .play-btn:disabled { background: #444; color: #777; cursor: not-allowed; }
+
+  .run-status {
+    font-size: 12px;
+    color: #555;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sample Run: Ticket to Ride Route Scorer</h1>
+
+<div class="legend" role="list" aria-label="Color legend">
+  <div class="legend-item" role="listitem">
+    <div class="legend-dot ld-computer" aria-hidden="true"></div>
+    <span>Computer output</span>
+  </div>
+  <div class="legend-item" role="listitem">
+    <div class="legend-dot ld-user" aria-hidden="true"></div>
+    <span>User typing</span>
+  </div>
+</div>
+
+<div class="terminal-wrap" role="region" aria-label="Terminal demo">
+  <div class="win-titlebar" aria-hidden="true">
+    <span class="win-title">Python 3.13.0 — ttr_route_scorer.py</span>
+    <div class="win-right">
+      <span class="status-badge" id="badge"></span>
+      <div class="win-buttons">
+        <div class="win-btn">—</div>
+        <div class="win-btn">□</div>
+        <div class="win-btn win-btn-close">✕</div>
+      </div>
+    </div>
+  </div>
+  <div class="terminal-body" id="output" role="log" aria-live="polite" tabindex="0"></div>
+</div>
+
+<div class="controls">
+  <button class="play-btn" id="playBtn" aria-label="Play sample run" onclick="startDemo()">▶ Play</button>
+  <span class="run-status" id="runStatus" aria-live="polite"></span>
+</div>
+
+<p class="sr-only">
+  This is an animated demonstration of a Python program. The program scores a Ticket to Ride turn including route points and destination ticket handling. Green text shows computer output; blue text shows user input.
+</p>
+
+<script>
+var steps = [
+  // Run 1 — valid input, ticket completed
+  { type: 'print', text: '=== Run 1: Valid input, destination ticket completed ===' },
+  { type: 'prompt', text: 'Enter a route length (1-6): ', input: '4' },
+  { type: 'print', text: 'Route length 4 is worth 7 points.' },
+  { type: 'prompt', text: 'Did you complete a destination ticket this turn? (yes/no): ', input: 'yes' },
+  { type: 'prompt', text: 'What is the ticket\'s point value? ', input: '12' },
+  { type: 'print', text: 'Destination ticket completed: +12 points' },
+  { type: 'print', text: 'Total score this turn: 19 points' },
+  { type: 'blank' },
+
+  // Run 2 — valid input, ticket not completed
+  { type: 'print', text: '=== Run 2: Valid input, destination ticket not completed ===' },
+  { type: 'prompt', text: 'Enter a route length (1-6): ', input: '3' },
+  { type: 'print', text: 'Route length 3 is worth 4 points.' },
+  { type: 'prompt', text: 'Did you complete a destination ticket this turn? (yes/no): ', input: 'no' },
+  { type: 'prompt', text: 'What is the ticket\'s point value? ', input: '8' },
+  { type: 'print', text: 'Destination ticket not completed: -8 points' },
+  { type: 'print', text: 'Total score this turn: -4 points' },
+  { type: 'blank' },
+
+  // Run 3 — invalid input
+  { type: 'print', text: '=== Run 3: Invalid input ===' },
+  { type: 'prompt', text: 'Enter a route length (1-6): ', input: '9' },
+  { type: 'print', text: 'That is not a valid route length. Enter a number between 1 and 6.' },
+];
+
+var timers = [];
+var running = false;
+
+function clearTimers() {
+  timers.forEach(function(t) { clearTimeout(t); });
+  timers = [];
+}
+
+function startDemo() {
+  clearTimers();
+  running = true;
+
+  var output = document.getElementById('output');
+  var btn = document.getElementById('playBtn');
+  var badge = document.getElementById('badge');
+  var status = document.getElementById('runStatus');
+
+  output.innerHTML = '';
+  btn.disabled = true;
+  badge.textContent = 'Running';
+  status.textContent = '';
+
+  var delay = 0;
+  var LINE_DELAY = 76;
+  var CHAR_DELAY = 84;
+  var PAUSE_AFTER_PROMPT = 960;
+  var SECTION_PAUSE = 600;
+
+  steps.forEach(function(step) {
+    if (step.type === 'blank') {
+      timers.push(setTimeout(function() {
+        var el = document.createElement('span');
+        el.className = 'line-computer';
+        el.textContent = '';
+        output.appendChild(el);
+        output.scrollTop = output.scrollHeight;
+      }, delay));
+      delay += SECTION_PAUSE;
+      return;
+    }
+
+    if (step.type === 'print') {
+      timers.push(setTimeout(function(s) {
+        return function() {
+          var el = document.createElement('span');
+          el.className = 'line-computer';
+          el.textContent = s.text;
+          output.appendChild(el);
+          output.scrollTop = output.scrollHeight;
+        };
+      }(step), delay));
+      delay += LINE_DELAY;
+      return;
+    }
+
+    if (step.type === 'prompt') {
+      timers.push(setTimeout(function(s) {
+        return function() {
+          var promptEl = document.createElement('span');
+          promptEl.className = 'line-computer';
+          promptEl.textContent = s.text;
+          output.appendChild(promptEl);
+
+          var cur = document.createElement('span');
+          cur.className = 'cursor';
+          output.appendChild(cur);
+          output.scrollTop = output.scrollHeight;
+        };
+      }(step), delay));
+      delay += 350;
+
+      var chars = step.input.split('');
+      chars.forEach(function(ch, ci) {
+        timers.push(setTimeout(function(c, isLast) {
+          return function() {
+            var cursors = output.querySelectorAll('.cursor');
+            cursors.forEach(function(cur) { cur.remove(); });
+
+            var charEl = document.createElement('span');
+            charEl.className = 'line-user';
+            charEl.textContent = c;
+            output.appendChild(charEl);
+
+            if (!isLast) {
+              var cur = document.createElement('span');
+              cur.className = 'cursor';
+              output.appendChild(cur);
+            }
+            output.scrollTop = output.scrollHeight;
+          };
+        }(ch, ci === chars.length - 1), delay + ci * CHAR_DELAY));
+      });
+      delay += chars.length * CHAR_DELAY + PAUSE_AFTER_PROMPT;
+
+      timers.push(setTimeout(function() {
+        var nl = document.createElement('span');
+        nl.className = 'line-computer';
+        nl.textContent = '';
+        output.appendChild(nl);
+        output.scrollTop = output.scrollHeight;
+      }, delay));
+      delay += LINE_DELAY;
+    }
+  });
+
+  timers.push(setTimeout(function() {
+    badge.textContent = 'Done';
+    btn.disabled = false;
+    status.textContent = 'Click Play to run again.';
+    running = false;
+  }, delay + 400));
+}
+</script>
+</body>
+</html>
